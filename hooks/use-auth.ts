@@ -15,8 +15,8 @@ export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load user from localStorage on mount
-  useEffect(() => {
+  // Load user from localStorage
+  const loadUser = () => {
     const storedUser = localStorage.getItem("currentUser")
     if (storedUser) {
       try {
@@ -24,9 +24,38 @@ export function useAuth() {
       } catch (error) {
         console.error("Failed to parse stored user:", error)
         localStorage.removeItem("currentUser")
+        setUser(null)
+      }
+    } else {
+      setUser(null)
+    }
+  }
+
+  // Load user on mount and listen for auth changes
+  useEffect(() => {
+    loadUser()
+    setIsLoading(false)
+
+    // Listen for custom auth events
+    const handleAuthChange = () => {
+      loadUser()
+    }
+
+    // Listen for storage events (cross-tab sync)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "currentUser") {
+        loadUser()
       }
     }
-    setIsLoading(false)
+
+    window.addEventListener("auth-change", handleAuthChange)
+    window.addEventListener("storage", handleStorageChange)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("auth-change", handleAuthChange)
+      window.removeEventListener("storage", handleStorageChange)
+    }
   }, [])
 
   const login = (email: string, role: "volunteer" | "organization" | "admin") => {
@@ -41,16 +70,30 @@ export function useAuth() {
         role: account.role as "volunteer" | "organization" | "admin",
         avatar: account.avatar,
       }
-      setUser(authUser)
+      
+      // Update localStorage first
       localStorage.setItem("currentUser", JSON.stringify(authUser))
+      
+      // Then update state immediately - this will trigger re-renders
+      setUser(authUser)
+      
+      // Force immediate re-render by dispatching event synchronously
+      window.dispatchEvent(new Event("auth-change"))
+      
       return true
     }
     return false
   }
 
   const logout = () => {
-    setUser(null)
+    // Update localStorage first
     localStorage.removeItem("currentUser")
+    
+    // Then update state immediately
+    setUser(null)
+    
+    // Force immediate re-render by dispatching event synchronously
+    window.dispatchEvent(new Event("auth-change"))
   }
 
   return { user, isLoading, login, logout }

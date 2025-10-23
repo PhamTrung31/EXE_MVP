@@ -126,9 +126,34 @@
 }
 
 @layer utilities {
+  /* Custom gradient colors */
+  .gradient-primary {
+    background: linear-gradient(135deg, #77E5C8 0%, #6085F0 100%);
+  }
+  
+  .gradient-secondary {
+    background: linear-gradient(135deg, #A7CBDC 0%, #77E5C8 100%);
+  }
+  
+  .gradient-accent {
+    background: linear-gradient(135deg, #FCDF98 0%, #77E5C8 100%);
+  }
+  
+  .gradient-full {
+    background: linear-gradient(135deg, #77E5C8 0%, #6085F0 50%, #A7CBDC 75%, #FCDF98 100%);
+  }
+  
+  /* Text gradients */
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #77E5C8 0%, #6085F0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
   /* Custom animations and effects */
   .bg-grid-pattern {
-    background-image: radial-gradient(circle, rgba(16, 185, 129, 0.1) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(119, 229, 200, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
   }
   
@@ -184,11 +209,11 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    background: rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, rgba(119, 229, 200, 0.4), rgba(96, 133, 240, 0.4));
     border-radius: 4px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(16, 185, 129, 0.5);
+    background: linear-gradient(135deg, rgba(119, 229, 200, 0.6), rgba(96, 133, 240, 0.6));
   }
 }
