@@ -151,6 +151,41 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Partner Organizations Section */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+                Đối tác tin cậy
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Hợp tác cùng các tổ chức uy tín hàng đầu Việt Nam
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+              {[
+                { name: "Trung tâm Từ Tâm", logo: "TT" },
+                { name: "Quỹ Hy Vọng", logo: "HV" },
+                { name: "Trái Tim Xanh", logo: "TX" },
+                { name: "Hội Bảo vệ Thiên nhiên", logo: "BT" },
+                { name: "Chương trình Ánh Sáng", logo: "AS" },
+                { name: "Trung tâm Nhân ái", logo: "NA" },
+              ].map((org) => (
+                <Card
+                  key={org.name}
+                  className="group p-6 flex flex-col items-center justify-center hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:scale-105 cursor-pointer"
+                >
+                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-lg group-hover:shadow-emerald-500/25 transition-all duration-300">
+                    <span className="text-white font-bold text-2xl">{org.logo}</span>
+                  </div>
+                  <p className="text-sm font-semibold text-foreground text-center">{org.name}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {!user && (
           <section className="relative py-20 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 overflow-hidden">
             <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
