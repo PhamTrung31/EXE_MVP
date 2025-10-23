@@ -96,14 +96,21 @@ export default function OrganizationDashboardPage() {
  </span>
  </div>
  <p className="text-sm text-muted-foreground mb-2">{program.location}</p>
- <div className="flex items-center justify-between">
- <p className="text-sm text-muted-foreground">
- {program.volunteersJoined}/{program.volunteersNeeded} tình nguyện viên
- </p>
- <Button size="sm" variant="outline" asChild>
- <Link href={`/programs/${program.id}/chat`}>Xem thảo luận</Link>
- </Button>
- </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">
+                          {program.volunteersJoined}/{program.volunteersNeeded} tình nguyện viên
+                        </p>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" asChild>
+                            <Link href={`/programs/${program.id}/chat`}>Xem thảo luận</Link>
+                          </Button>
+                          {program.status === "active" && (
+                            <Button size="sm" className="gradient-primary text-white" asChild>
+                              <Link href={`/organization/programs/${program.id}/complete`}>Hoàn thành</Link>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
  </div>
  ))
  ) : (

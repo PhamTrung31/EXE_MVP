@@ -30,28 +30,88 @@ export default function ProfileSettingsPage() {
  confirmPassword: "",
  })
 
- const handleProfileUpdate = async (e: React.FormEvent) => {
- e.preventDefault()
- setIsLoading(true)
- // Simulate API call
- await new Promise(resolve => setTimeout(resolve, 1000))
- setIsLoading(false)
- // Show success message
- }
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    try {
+      // Get current user from localStorage
+      const storedUser = localStorage.getItem("currentUser")
+      if (!storedUser) {
+        alert("Không tìm thấy thông tin người dùng")
+        return
+      }
 
- const handlePasswordChange = async (e: React.FormEvent) => {
- e.preventDefault()
- if (passwordData.newPassword !== passwordData.confirmPassword) {
- alert("Mật khẩu mới không khớp!")
- return
- }
- setIsLoading(true)
- // Simulate API call
- await new Promise(resolve => setTimeout(resolve, 1000))
- setIsLoading(false)
- setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
- // Show success message
- }
+      const currentUser = JSON.parse(storedUser)
+      
+      // Update user data
+      const updatedUser = {
+        ...currentUser,
+        name: profileData.name,
+        email: profileData.email,
+        phone: profileData.phone,
+        bio: profileData.bio,
+        address: profileData.address,
+        website: profileData.website,
+      }
+
+      // Save to localStorage
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser))
+      
+      // Dispatch event to update all components
+      window.dispatchEvent(new Event("auth-change"))
+      
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsLoading(false)
+      alert("Cập nhật thông tin thành công!")
+    } catch (error) {
+      setIsLoading(false)
+      alert("Có lỗi xảy ra khi cập nhật thông tin")
+    }
+  }
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert("Mật khẩu mới không khớp!")
+      return
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      alert("Mật khẩu mới phải có ít nhất 6 ký tự!")
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      // In real app, verify current password with backend
+      // For demo, we'll just update it
+      
+      // Get stored passwords (for demo only - in real app this would be on backend)
+      const storedPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}")
+      
+      // Verify current password
+      if (storedPasswords[user.id] && storedPasswords[user.id] !== passwordData.currentPassword) {
+        alert("Mật khẩu hiện tại không đúng!")
+        setIsLoading(false)
+        return
+      }
+      
+      // Update password
+      storedPasswords[user.id] = passwordData.newPassword
+      localStorage.setItem("userPasswords", JSON.stringify(storedPasswords))
+      
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsLoading(false)
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
+      alert("Đổi mật khẩu thành công!")
+    } catch (error) {
+      setIsLoading(false)
+      alert("Có lỗi xảy ra khi đổi mật khẩu")
+    }
+  }
 
  if (!user) {
  return (

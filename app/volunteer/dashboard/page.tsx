@@ -10,11 +10,18 @@ import { Award, Clock, CheckCircle, LogOut, Info } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
 export default function VolunteerDashboardPage() {
- const { user } = useAuth()
- const volunteer = mockAccounts.find((a) => a.id === user?.id)
- const registrations = mockRegistrations.filter((r) => r.volunteerId === user?.id)
- const certificates = mockCertificates.filter((c) => c.volunteerId === user?.id)
- const totalHours = registrations.reduce((sum, r) => sum + (r.hoursContributed || 0), 0)
+  const { user } = useAuth()
+  const volunteer = mockAccounts.find((a) => a.id === user?.id)
+  const registrations = mockRegistrations.filter((r) => r.volunteerId === user?.id)
+  
+  // Load certificates (mock + custom)
+  const mockCerts = mockCertificates.filter((c) => c.volunteerId === user?.id)
+  const customCerts = typeof window !== "undefined" 
+    ? JSON.parse(localStorage.getItem("customCertificates") || "[]").filter((c: any) => c.volunteerId === user?.id)
+    : []
+  const certificates = [...mockCerts, ...customCerts]
+  
+  const totalHours = certificates.reduce((sum, c) => sum + (c.hoursContributed || 0), 0)
 
  return (
  <div className="min-h-screen flex flex-col bg-background">

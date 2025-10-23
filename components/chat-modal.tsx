@@ -13,7 +13,16 @@ interface ChatModalProps {
 export function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const { user } = useAuth()
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null)
+  const [customMessages, setCustomMessages] = useState<any[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Load custom messages from localStorage
+  useEffect(() => {
+    const storedMessages = localStorage.getItem("customChatMessages")
+    if (storedMessages) {
+      setCustomMessages(JSON.parse(storedMessages))
+    }
+  }, [isOpen])
 
   // Close modal when user logs out
   useEffect(() => {
@@ -49,13 +58,17 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
  }, [selectedProgramId])
 
- const selectedProgramData = programsWithChat.find(item => item.program?.id === selectedProgramId)
- const selectedProgram = selectedProgramData?.program
- const selectedRegistration = selectedProgramData?.registration
- 
- const messages = selectedProgramId 
- ? mockChatMessages.filter((m) => m.programId === selectedProgramId)
- : []
+  const selectedProgramData = programsWithChat.find(item => item.program?.id === selectedProgramId)
+  const selectedProgram = selectedProgramData?.program
+  const selectedRegistration = selectedProgramData?.registration
+  
+  // Combine mock messages and custom messages
+  const messages = selectedProgramId 
+    ? [
+        ...mockChatMessages.filter((m) => m.programId === selectedProgramId),
+        ...customMessages.filter((m) => m.programId === selectedProgramId)
+      ]
+    : []
 
  if (!isOpen) return null
 

@@ -2,24 +2,33 @@
 
 import type React from "react"
 
-import { use } from "react"
+import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { mockPrograms, mockChatMessages, mockRegistrations } from "@/lib/mock-data"
-import { useState } from "react"
 import { ArrowLeft, Send, Lock } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
 export default function ProgramChatPage({ params }: { params: Promise<{ id: string }> }) {
- const { id } = use(params)
- const program = mockPrograms.find((p) => p.id === id)
- const messages = mockChatMessages.filter((m) => m.programId === id)
- const [newMessage, setNewMessage] = useState("")
- const [allMessages, setAllMessages] = useState(messages)
- const { user, isLoading } = useAuth()
+  const { id } = use(params)
+  const program = mockPrograms.find((p) => p.id === id)
+  const mockMessages = mockChatMessages.filter((m) => m.programId === id)
+  const [newMessage, setNewMessage] = useState("")
+  const [allMessages, setAllMessages] = useState(mockMessages)
+  const { user, isLoading } = useAuth()
+
+  // Load custom messages from localStorage
+  useEffect(() => {
+    const storedMessages = localStorage.getItem("customChatMessages")
+    if (storedMessages) {
+      const parsed = JSON.parse(storedMessages)
+      const programCustomMessages = parsed.filter((m: any) => m.programId === id)
+      setAllMessages([...mockMessages, ...programCustomMessages])
+    }
+  }, [id, mockMessages])
 
  const userRegistration = user
  ? mockRegistrations.find((r) => r.volunteerId === user.id && r.programId === id)
@@ -30,22 +39,30 @@ export default function ProgramChatPage({ params }: { params: Promise<{ id: stri
  const canSendMessage = isOrganizationOwner
  const hasAccess = isVolunteerWithAccess || isOrganizationOwner
 
- const handleSendMessage = (e: React.FormEvent) => {
- e.preventDefault()
- if (newMessage.trim() && canSendMessage && user) {
- const message = {
- id: `msg-${Date.now()}`,
- programId: id,
- userId: user.id,
- userName: user.name,
- userRole: user.role as "volunteer" | "organization" | "admin",
- message: newMessage,
- timestamp: new Date().toISOString(),
- }
- setAllMessages([...allMessages, message])
- setNewMessage("")
- }
- }
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newMessage.trim() && canSendMessage && user) {
+      const message = {
+        id: `msg-${Date.now()}`,
+        programId: id,
+        userId: user.id,
+        userName: user.name,
+        userRole: user.role as "volunteer" | "organization" | "admin",
+        message: newMessage,
+        timestamp: new Date().toISOString(),
+      }
+      
+      // Update local state
+      setAllMessages([...allMessages, message])
+      
+      // Persist to localStorage
+      const storedMessages = localStorage.getItem("customChatMessages")
+      const existingMessages = storedMessages ? JSON.parse(storedMessages) : []
+      localStorage.setItem("customChatMessages", JSON.stringify([...existingMessages, message]))
+      
+      setNewMessage("")
+    }
+  }
 
  if (isLoading) {
  return (

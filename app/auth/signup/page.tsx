@@ -35,8 +35,23 @@ function SignupForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock signup - in real app, this would call an API
-    alert(`Đăng ký thành công với vai trò: ${role === "volunteer" ? "Tình nguyện viên" : "Tổ chức"}!`)
+    
+    // Create account registration object
+    const accountRegistration = {
+      id: `acc-${Date.now()}`,
+      ...formData,
+      role: role,
+      status: "pending", // Wait for admin approval
+      registeredDate: new Date().toISOString().split("T")[0],
+    }
+    
+    // Save to localStorage for admin approval
+    const stored = localStorage.getItem("accountRegistrations")
+    const registrations = stored ? JSON.parse(stored) : []
+    registrations.push(accountRegistration)
+    localStorage.setItem("accountRegistrations", JSON.stringify(registrations))
+    
+    alert(`Đăng ký thành công! Tài khoản của bạn đang chờ Admin phê duyệt.`)
     router.push("/auth/login")
   }
 
