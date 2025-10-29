@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { useState, useEffect, Suspense } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
 
 function SignupForm() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const [role, setRole] = useState<"volunteer" | "organization">("volunteer")
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [role, setRole] = useState<"volunteer" | "organization">("volunteer");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,19 +23,19 @@ function SignupForm() {
     bio: "",
     address: "",
     website: "",
-  })
+  });
 
   // Check if coming from "Dành cho tổ chức" - set role to organization
   useEffect(() => {
-    const roleParam = searchParams.get("role")
+    const roleParam = searchParams.get("role");
     if (roleParam === "organization") {
-      setRole("organization")
+      setRole("organization");
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Create account registration object
     const accountRegistration = {
       id: `acc-${Date.now()}`,
@@ -43,24 +43,26 @@ function SignupForm() {
       role: role,
       status: "pending", // Wait for admin approval
       registeredDate: new Date().toISOString().split("T")[0],
-    }
-    
-    // Save to localStorage for admin approval
-    const stored = localStorage.getItem("accountRegistrations")
-    const registrations = stored ? JSON.parse(stored) : []
-    registrations.push(accountRegistration)
-    localStorage.setItem("accountRegistrations", JSON.stringify(registrations))
-    
-    alert(`Đăng ký thành công! Tài khoản của bạn đang chờ Admin phê duyệt.`)
-    router.push("/auth/login")
-  }
+    };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    // Save to localStorage for admin approval
+    const stored = localStorage.getItem("accountRegistrations");
+    const registrations = stored ? JSON.parse(stored) : [];
+    registrations.push(accountRegistration);
+    localStorage.setItem("accountRegistrations", JSON.stringify(registrations));
+
+    alert(`Đăng ký thành công! Tài khoản của bạn đang chờ Admin phê duyệt.`);
+    router.push("/auth/login");
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -68,13 +70,19 @@ function SignupForm() {
 
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-2xl p-8 border-[#77E5C8]">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Đăng ký tài khoản</h1>
-          <p className="text-muted-foreground mb-8">Tạo tài khoản mới để bắt đầu</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Đăng ký tài khoản
+          </h1>
+          <p className="text-muted-foreground mb-8">
+            Tạo tài khoản mới để bắt đầu
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">Đăng ký với vai trò</label>
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Đăng ký với vai trò
+              </label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -114,7 +122,11 @@ function SignupForm() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder={role === "volunteer" ? "Nguyễn Văn A" : "Tên tổ chức của bạn"}
+                    placeholder={
+                      role === "volunteer"
+                        ? "Nguyễn Văn A"
+                        : "Tên tổ chức của bạn"
+                    }
                     className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6085F0] bg-background text-foreground"
                     required
                   />
@@ -122,7 +134,9 @@ function SignupForm() {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Email</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Email
+                  </label>
                   <input
                     type="email"
                     name="email"
@@ -136,7 +150,9 @@ function SignupForm() {
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Số điện thoại</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Số điện thoại
+                  </label>
                   <input
                     type="tel"
                     name="phone"
@@ -150,7 +166,9 @@ function SignupForm() {
 
                 {/* Password */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Mật khẩu</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Mật khẩu
+                  </label>
                   <input
                     type="password"
                     name="password"
@@ -167,7 +185,9 @@ function SignupForm() {
                   <>
                     {/* Address */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Địa chỉ văn phòng</label>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Địa chỉ văn phòng
+                      </label>
                       <input
                         type="text"
                         name="address"
@@ -181,7 +201,9 @@ function SignupForm() {
 
                     {/* Website */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Website</label>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Website
+                      </label>
                       <input
                         type="url"
                         name="website"
@@ -196,7 +218,9 @@ function SignupForm() {
                   <>
                     {/* Volunteer: Address (optional) */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Địa chỉ (không bắt buộc)</label>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Địa chỉ (không bắt buộc)
+                      </label>
                       <input
                         type="text"
                         name="address"
@@ -209,7 +233,9 @@ function SignupForm() {
 
                     {/* Volunteer: Date of Birth */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Ngày sinh (không bắt buộc)</label>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Ngày sinh (không bắt buộc)
+                      </label>
                       <input
                         type="date"
                         name="website"
@@ -225,7 +251,9 @@ function SignupForm() {
               {/* Bio - Full width */}
               <div className="mt-4">
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  {role === "volunteer" ? "Giới thiệu bản thân" : "Giới thiệu tổ chức"}
+                  {role === "volunteer"
+                    ? "Giới thiệu bản thân"
+                    : "Giới thiệu tổ chức"}
                 </label>
                 <textarea
                   name="bio"
@@ -243,7 +271,10 @@ function SignupForm() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full gradient-primary hover:opacity-90 text-white py-3">
+            <Button
+              type="submit"
+              className="w-full gradient-primary hover:opacity-90 text-white py-3"
+            >
               Đăng ký
             </Button>
           </form>
@@ -251,7 +282,10 @@ function SignupForm() {
           <div className="mt-6 text-center">
             <p className="text-muted-foreground">
               Đã có tài khoản?{" "}
-              <Link href="/auth/login" className="text-[#6085F0] hover:underline font-semibold">
+              <Link
+                href="/auth/login"
+                className="text-[#6085F0] hover:underline font-semibold"
+              >
                 Đăng nhập ngay
               </Link>
             </p>
@@ -261,27 +295,28 @@ function SignupForm() {
 
       <Footer />
     </div>
-  )
+  );
 }
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 flex items-center justify-center py-12 px-4">
-          <Card className="w-full max-w-2xl p-8 border-[#77E5C8]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6085F0] mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Đang tải...</p>
-            </div>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col bg-background">
+          <Header />
+          <main className="flex-1 flex items-center justify-center py-12 px-4">
+            <Card className="w-full max-w-2xl p-8 border-[#77E5C8]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6085F0] mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Đang tải...</p>
+              </div>
+            </Card>
+          </main>
+          <Footer />
+        </div>
+      }
+    >
       <SignupForm />
     </Suspense>
-  )
+  );
 }
-

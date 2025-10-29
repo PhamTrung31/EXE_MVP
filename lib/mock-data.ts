@@ -5,7 +5,7 @@ import type {
   Certificate,
   ChatMessage,
   OrganizationRegistration,
-} from "./types"
+} from "./types";
 
 export const mockAccounts: Account[] = [
   {
@@ -66,14 +66,16 @@ export const mockAccounts: Account[] = [
     role: "admin",
     createdAt: "2023-01-01",
   },
-]
+];
 
 export const mockPrograms: Program[] = [
   {
     id: "prog-001",
     name: "Dạy kèm cho trẻ em vùng sâu",
-    description: "Giúp trẻ em vùng sâu vùng xa có cơ hội học tập tốt hơn thông qua các buổi dạy kèm miễn phí",
-    domesticDescription: "Chương trình dạy kèm miễn phí cho trẻ em vùng sâu vùng xa tại Việt Nam",
+    description:
+      "Giúp trẻ em vùng sâu vùng xa có cơ hội học tập tốt hơn thông qua các buổi dạy kèm miễn phí",
+    domesticDescription:
+      "Chương trình dạy kèm miễn phí cho trẻ em vùng sâu vùng xa tại Việt Nam",
     isInternational: false,
     organizationId: "org-001",
     organizationName: "Tổ chức Từ Tâm",
@@ -92,8 +94,10 @@ export const mockPrograms: Program[] = [
   {
     id: "prog-002",
     name: "Trồng cây xanh cho thành phố",
-    description: "Cùng nhau trồng cây xanh để bảo vệ môi trường và làm đẹp thành phố",
-    domesticDescription: "Hoạt động trồng cây xanh tại các khu vực công cộng trong thành phố",
+    description:
+      "Cùng nhau trồng cây xanh để bảo vệ môi trường và làm đẹp thành phố",
+    domesticDescription:
+      "Hoạt động trồng cây xanh tại các khu vực công cộng trong thành phố",
     isInternational: false,
     organizationId: "org-002",
     organizationName: "Xanh Việt",
@@ -112,8 +116,10 @@ export const mockPrograms: Program[] = [
   {
     id: "prog-003",
     name: "Chăm sóc người già cô đơn",
-    description: "Đến thăm và chăm sóc những người già cô đơn, mang lại niềm vui cho họ",
-    domesticDescription: "Chương trình thăm hỏi và chăm sóc người cao tuổi cô đơn tại Việt Nam",
+    description:
+      "Đến thăm và chăm sóc những người già cô đơn, mang lại niềm vui cho họ",
+    domesticDescription:
+      "Chương trình thăm hỏi và chăm sóc người cao tuổi cô đơn tại Việt Nam",
     isInternational: false,
     organizationId: "org-001",
     organizationName: "Tổ chức Từ Tâm",
@@ -146,9 +152,12 @@ export const mockPrograms: Program[] = [
   {
     id: "prog-005",
     name: "Sáng kiến Giáo dục Toàn cầu",
-    description: "Chương trình tình nguyện quốc tế hỗ trợ giáo dục tại các nước đang phát triển",
-    domesticDescription: "Chương trình giáo dục quốc tế hỗ trợ trẻ em tại các nước đang phát triển",
-    internationalDescription: "Tham gia cùng đội ngũ quốc tế của chúng tôi để cung cấp hỗ trợ giáo dục và tài nguyên cho trẻ em tại các nước đang phát triển ở Đông Nam Á",
+    description:
+      "Chương trình tình nguyện quốc tế hỗ trợ giáo dục tại các nước đang phát triển",
+    domesticDescription:
+      "Chương trình giáo dục quốc tế hỗ trợ trẻ em tại các nước đang phát triển",
+    internationalDescription:
+      "Tham gia cùng đội ngũ quốc tế của chúng tôi để cung cấp hỗ trợ giáo dục và tài nguyên cho trẻ em tại các nước đang phát triển ở Đông Nam Á",
     isInternational: true,
     organizationId: "org-001",
     organizationName: "Tổ chức Từ Tâm",
@@ -166,7 +175,8 @@ export const mockPrograms: Program[] = [
     name: "Bảo tồn Môi trường Quốc tế",
     description: "Nỗ lực bảo vệ và bảo tồn môi trường xuyên biên giới",
     domesticDescription: "Chương trình bảo vệ môi trường xuyên biên giới",
-    internationalDescription: "Tham gia các dự án bảo tồn môi trường quốc tế trên nhiều quốc gia trong khu vực",
+    internationalDescription:
+      "Tham gia các dự án bảo tồn môi trường quốc tế trên nhiều quốc gia trong khu vực",
     isInternational: true,
     organizationId: "org-002",
     organizationName: "Xanh Việt",
@@ -179,7 +189,7 @@ export const mockPrograms: Program[] = [
     image: "/planting-trees.png",
     status: "active",
   },
-]
+];
 
 export const mockRegistrations: VolunteerRegistration[] = [
   {
@@ -235,7 +245,7 @@ export const mockRegistrations: VolunteerRegistration[] = [
     approvedDate: "2024-03-27",
     hoursContributed: 18,
   },
-]
+];
 
 export const mockCertificates: Certificate[] = [
   {
@@ -258,7 +268,7 @@ export const mockCertificates: Certificate[] = [
     issuedDate: "2024-05-20",
     certificateNumber: "CERT-2024-002",
   },
-]
+];
 
 export const mockOrganizationRegistrations: OrganizationRegistration[] = [
   {
@@ -279,7 +289,7 @@ export const mockOrganizationRegistrations: OrganizationRegistration[] = [
     status: "pending",
     appliedDate: "2024-10-18",
   },
-]
+];
 
 export const mockChatMessages: ChatMessage[] = [
   {
@@ -288,7 +298,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-001",
     userName: "Tổ chức Từ Tâm",
     userRole: "organization",
-    message: "Chào các bạn tình nguyện viên! Chúng tôi rất vui khi có các bạn tham gia chương trình này.",
+    message:
+      "Chào các bạn tình nguyện viên! Chúng tôi rất vui khi có các bạn tham gia chương trình này.",
     timestamp: "2024-04-01T08:00:00",
   },
   {
@@ -297,7 +308,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-001",
     userName: "Tổ chức Từ Tâm",
     userRole: "organization",
-    message: "Buổi dạy kèm hôm nay lúc 14:00 tại trường tiểu học Nguyễn Huệ. Các bạn chuẩn bị sẵn sàng nhé!",
+    message:
+      "Buổi dạy kèm hôm nay lúc 14:00 tại trường tiểu học Nguyễn Huệ. Các bạn chuẩn bị sẵn sàng nhé!",
     timestamp: "2024-04-01T11:00:00",
   },
   {
@@ -306,7 +318,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-001",
     userName: "Tổ chức Từ Tâm",
     userRole: "organization",
-    message: "Cảm ơn các bạn đã tham gia buổi dạy kèm hôm nay. Các em học sinh rất vui và tiến bộ nhiều!",
+    message:
+      "Cảm ơn các bạn đã tham gia buổi dạy kèm hôm nay. Các em học sinh rất vui và tiến bộ nhiều!",
     timestamp: "2024-04-01T16:30:00",
   },
   {
@@ -315,7 +328,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-001",
     userName: "Tổ chức Từ Tâm",
     userRole: "organization",
-    message: "Tuần tới chúng ta sẽ có buổi dạy kèm đặc biệt với chủ đề 'Khoa học vui'. Các bạn chuẩn bị một số thí nghiệm đơn giản nhé!",
+    message:
+      "Tuần tới chúng ta sẽ có buổi dạy kèm đặc biệt với chủ đề 'Khoa học vui'. Các bạn chuẩn bị một số thí nghiệm đơn giản nhé!",
     timestamp: "2024-04-02T09:15:00",
   },
   {
@@ -324,7 +338,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-002",
     userName: "Xanh Việt",
     userRole: "organization",
-    message: "Chào mừng các bạn đến với chương trình trồng cây xanh! Chúng ta sẽ bắt đầu từ 7:00 sáng ngày mai.",
+    message:
+      "Chào mừng các bạn đến với chương trình trồng cây xanh! Chúng ta sẽ bắt đầu từ 7:00 sáng ngày mai.",
     timestamp: "2024-05-01T09:00:00",
   },
   {
@@ -333,7 +348,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-002",
     userName: "Xanh Việt",
     userRole: "organization",
-    message: "Nhớ mang theo nước uống và mũ nón. Chúng ta sẽ trồng cây tại công viên Lê Văn Tám.",
+    message:
+      "Nhớ mang theo nước uống và mũ nón. Chúng ta sẽ trồng cây tại công viên Lê Văn Tám.",
     timestamp: "2024-05-01T14:20:00",
   },
   {
@@ -342,7 +358,8 @@ export const mockChatMessages: ChatMessage[] = [
     userId: "org-001",
     userName: "Tổ chức Từ Tâm",
     userRole: "organization",
-    message: "Cảm ơn các bạn đã tham gia chương trình chăm sóc người già. Hãy mang theo tinh thần yêu thương và sự kiên nhẫn.",
+    message:
+      "Cảm ơn các bạn đã tham gia chương trình chăm sóc người già. Hãy mang theo tinh thần yêu thương và sự kiên nhẫn.",
     timestamp: "2024-03-15T10:00:00",
   },
-]
+];
