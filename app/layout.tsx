@@ -10,9 +10,9 @@ const _inter = Inter({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "Together",
+  description:
+    "Nền tảng kết nối tình nguyện viên với các chương trình thiện nguyện",
 };
 
 export default function RootLayout({
