@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,8 +17,35 @@ export default function ProgramDetailPage({
 }) {
   const { id } = use(params);
   const { user } = useAuth();
-  const program = mockPrograms.find((p) => p.id === id);
-  const registrations = mockRegistrations.filter((r) => r.programId === id);
+  const [customPrograms, setCustomPrograms] = useState<any[]>([]);
+  
+  // Load custom programs
+  useEffect(() => {
+    const stored = localStorage.getItem("customPrograms");
+    if (stored) {
+      setCustomPrograms(JSON.parse(stored));
+    }
+  }, []);
+  
+  const allPrograms = [...mockPrograms, ...customPrograms];
+  const program = allPrograms.find((p) => p.id === id);
+  
+  // Load custom registrations
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
+  useEffect(() => {
+    const stored = localStorage.getItem("programRegistrations");
+    if (stored) {
+      setCustomRegistrations(JSON.parse(stored));
+    }
+  }, []);
+  
+  const allRegistrations = [...mockRegistrations, ...customRegistrations];
+  const registrations = allRegistrations.filter((r) => r.programId === id);
+  
+  // Check if current user already registered
+  const userRegistration = user 
+    ? allRegistrations.find((r) => r.programId === id && r.volunteerId === user.id)
+    : null;
 
   if (!program) {
     return (
@@ -241,14 +268,31 @@ export default function ProgramDetailPage({
 
                 {/* Only show register button for volunteers and non-logged-in users */}
                 {(!user || user.role === "volunteer") && (
-                  <Button
-                    className="w-full bg-[#6085F0] hover:opacity-90 mb-3"
-                    asChild
-                  >
-                    <Link href={`/programs/${id}/register`}>
-                      Đăng ký tham gia
-                    </Link>
-                  </Button>
+                  <>
+                    {userRegistration ? (
+                      <Button
+                        className="w-full mb-3"
+                        disabled
+                        variant={userRegistration.status === "approved" ? "default" : "outline"}
+                      >
+                        {userRegistration.status === "approved" 
+                          ? "✓ Đã tham gia" 
+                          : userRegistration.status === "pending"
+                          ? "⏳ Chờ duyệt"
+                          : "❌ Đã từ chối"
+                        }
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full gradient-primary hover:opacity-90 mb-3"
+                        asChild
+                      >
+                        <Link href={`/programs/${id}/register`}>
+                          Đăng ký tham gia
+                        </Link>
+                      </Button>
+                    )}
+                  </>
                 )}
                 <Button
                   className="w-full bg-transparent"

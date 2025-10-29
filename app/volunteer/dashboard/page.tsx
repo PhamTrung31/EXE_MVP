@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,20 +16,46 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function VolunteerDashboardPage() {
   const { user } = useAuth();
-  const volunteer = mockAccounts.find((a) => a.id === user?.id);
-  const registrations = mockRegistrations.filter(
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
+  const [customCerts, setCustomCerts] = useState<any[]>([]);
+  const [volunteerFull, setVolunteerFull] = useState<any | null>(null);
+  
+  const volunteer = volunteerFull || mockAccounts.find((a) => a.id === user?.id);
+  
+  // Load custom data
+  useEffect(() => {
+    // Load full user data from localStorage for demo accounts
+    try {
+      const storedUser = localStorage.getItem("currentUser");
+      if (storedUser) {
+        setVolunteerFull(JSON.parse(storedUser));
+      } else {
+        const approved = JSON.parse(localStorage.getItem("approvedAccounts") || "[]");
+        const found = approved.find((a: any) => a.id === user?.id || a.email === user?.email);
+        if (found) setVolunteerFull(found);
+      }
+    } catch {}
+
+    const storedRegs = localStorage.getItem("programRegistrations");
+    if (storedRegs) {
+      setCustomRegistrations(JSON.parse(storedRegs));
+    }
+    
+    const storedCerts = localStorage.getItem("customCertificates");
+    if (storedCerts) {
+      setCustomCerts(JSON.parse(storedCerts));
+    }
+  }, [user?.id]);
+  
+  const allRegistrations = [...mockRegistrations, ...customRegistrations];
+  const registrations = allRegistrations.filter(
     (r) => r.volunteerId === user?.id,
   );
 
   // Load certificates (mock + custom)
   const mockCerts = mockCertificates.filter((c) => c.volunteerId === user?.id);
-  const customCerts =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("customCertificates") || "[]").filter(
-          (c: any) => c.volunteerId === user?.id,
-        )
-      : [];
-  const certificates = [...mockCerts, ...customCerts];
+  const filteredCustomCerts = customCerts.filter((c: any) => c.volunteerId === user?.id);
+  const certificates = [...mockCerts, ...filteredCustomCerts];
 
   const totalHours = certificates.reduce(
     (sum, c) => sum + (c.hoursContributed || 0),

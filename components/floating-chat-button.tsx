@@ -10,6 +10,7 @@ export function FloatingChatButton() {
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
 
   // Close chat when user logs out
   useEffect(() => {
@@ -18,13 +19,21 @@ export function FloatingChatButton() {
     }
   }, [user]);
 
+  // Load custom registrations
+  useEffect(() => {
+    const stored = localStorage.getItem("programRegistrations");
+    if (stored) {
+      setCustomRegistrations(JSON.parse(stored));
+    }
+  }, [user?.id]);
+
   // Only show for volunteers
   if (!user || user.role !== "volunteer") {
     return null;
   }
 
-  // Get all programs the volunteer has registered for (approved or pending)
-  const userRegistrations = mockRegistrations.filter(
+  const allRegistrations = [...mockRegistrations, ...customRegistrations];
+  const userRegistrations = allRegistrations.filter(
     (r) => r.volunteerId === user.id,
   );
 

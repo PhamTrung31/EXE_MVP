@@ -8,12 +8,53 @@ import { Footer } from "@/components/footer";
 import { mockAccounts, mockPrograms, mockRegistrations } from "@/lib/mock-data";
 import { Users, Briefcase, CheckCircle, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function OrganizationDashboardPage() {
   const [registrations, setRegistrations] = useState(mockRegistrations);
-  const organization = mockAccounts.find((a) => a.id === "org-001");
-  const programs = mockPrograms.filter((p) => p.organizationId === "org-001");
-  const organizationRegistrations = registrations.filter((r) =>
+  const [customPrograms, setCustomPrograms] = useState<any[]>([]);
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
+  const { user } = useAuth();
+  const [organizationFull, setOrganizationFull] = useState<any | null>(null);
+  
+  const organization = organizationFull || mockAccounts.find((a) => a.id === user?.id);
+  
+  // Load custom programs and registrations
+  useEffect(() => {
+    // Load full org data from localStorage for demo accounts
+    try {
+      const storedUser = localStorage.getItem("currentUser");
+      if (storedUser) {
+        setOrganizationFull(JSON.parse(storedUser));
+      } else {
+        const approved = JSON.parse(localStorage.getItem("approvedAccounts") || "[]");
+        const found = approved.find((a: any) => a.id === user?.id || a.email === user?.email);
+        if (found) setOrganizationFull(found);
+      }
+    } catch {}
+
+    const storedPrograms = localStorage.getItem("customPrograms");
+    if (storedPrograms) {
+      setCustomPrograms(JSON.parse(storedPrograms));
+    }
+    
+    const storedRegistrations = localStorage.getItem("programRegistrations");
+    if (storedRegistrations) {
+      setCustomRegistrations(JSON.parse(storedRegistrations));
+    }
+  }, []);
+  
+  // Combine mock and custom programs for this organization
+  const allPrograms = [
+    ...mockPrograms.filter((p) => p.organizationId === user?.id),
+    ...customPrograms.filter((p) => p.organizationId === user?.id),
+  ];
+  
+  const programs = allPrograms;
+  
+  // Combine mock and custom registrations
+  const allRegistrations = [...registrations, ...customRegistrations];
+  const organizationRegistrations = allRegistrations.filter((r) =>
     programs.some((p) => p.id === r.programId),
   );
   const approvedRegistrations = organizationRegistrations.filter(
@@ -29,7 +70,11 @@ export default function OrganizationDashboardPage() {
   }, []);
 
   const handleApproveRegistration = (id: string) => {
-    const updated = registrations.map((r) =>
+    // Find the registration to get program ID
+    const registration = [...registrations, ...customRegistrations].find((r) => r.id === id);
+    
+    // Update mock registrations
+    const updatedMock = registrations.map((r) =>
       r.id === id
         ? {
             ...r,
@@ -38,24 +83,60 @@ export default function OrganizationDashboardPage() {
           }
         : r,
     );
-    setRegistrations(updated);
+    setRegistrations(updatedMock);
+    
+    // Update custom registrations
+    const updatedCustom = customRegistrations.map((r) =>
+      r.id === id
+        ? {
+            ...r,
+            status: "approved",
+            approvedDate: new Date().toISOString().split("T")[0],
+          }
+        : r,
+    );
+    setCustomRegistrations(updatedCustom);
+    
+    // Update volunteer count in custom programs
+    if (registration) {
+      const updatedPrograms = customPrograms.map((p) =>
+        p.id === registration.programId
+          ? { ...p, volunteersJoined: (p.volunteersJoined || 0) + 1 }
+          : p,
+      );
+      setCustomPrograms(updatedPrograms);
+      localStorage.setItem("customPrograms", JSON.stringify(updatedPrograms));
+    }
+    
+    // Save to localStorage
+    localStorage.setItem("programRegistrations", JSON.stringify(updatedCustom));
     localStorage.setItem(
       "registrations",
       JSON.stringify(
-        updated.filter((r) => !mockRegistrations.some((mr) => mr.id === r.id)),
+        updatedMock.filter((r) => !mockRegistrations.some((mr) => mr.id === r.id)),
       ),
     );
   };
 
   const handleRejectRegistration = (id: string) => {
-    const updated = registrations.map((r) =>
+    // Update mock registrations
+    const updatedMock = registrations.map((r) =>
       r.id === id ? { ...r, status: "rejected" } : r,
     );
-    setRegistrations(updated);
+    setRegistrations(updatedMock);
+    
+    // Update custom registrations
+    const updatedCustom = customRegistrations.map((r) =>
+      r.id === id ? { ...r, status: "rejected" } : r,
+    );
+    setCustomRegistrations(updatedCustom);
+    
+    // Save to localStorage
+    localStorage.setItem("programRegistrations", JSON.stringify(updatedCustom));
     localStorage.setItem(
       "registrations",
       JSON.stringify(
-        updated.filter((r) => !mockRegistrations.some((mr) => mr.id === r.id)),
+        updatedMock.filter((r) => !mockRegistrations.some((mr) => mr.id === r.id)),
       ),
     );
   };
@@ -147,6 +228,13 @@ export default function OrganizationDashboardPage() {
                             {program.volunteersNeeded} tình nguyện viên
                           </p>
                           <div className="flex gap-2">
+                            {program.volunteersJoined === 0 && program.status === "active" && (
+                              <Button size="sm" variant="outline" asChild className="border-[#77E5C8]">
+                                <Link href={`/organization/programs/${program.id}/edit`}>
+                                  Chỉnh sửa
+                                </Link>
+                              </Button>
+                            )}
                             <Button size="sm" variant="outline" asChild>
                               <Link href={`/programs/${program.id}/chat`}>
                                 Xem thảo luận

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,10 +17,10 @@ export default function ProfileSettingsPage() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    bio: user?.bio || "",
+    name: "",
+    email: "",
+    phone: "",
+    bio: "",
     address: "",
     website: "",
   });
@@ -29,6 +29,26 @@ export default function ProfileSettingsPage() {
     newPassword: "",
     confirmPassword: "",
   });
+
+  // Load user data when user is available
+  useEffect(() => {
+    if (user) {
+      // Load full user data from localStorage.currentUser
+      const storedUser = localStorage.getItem("currentUser");
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        
+        setProfileData({
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          bio: userData.bio || "",
+          address: userData.address || "",
+          website: userData.website || "",
+        });
+      }
+    }
+  }, [user]);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +75,17 @@ export default function ProfileSettingsPage() {
         website: profileData.website,
       };
 
-      // Save to localStorage
+      // Save to localStorage.currentUser
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+
+      // Also update in approvedAccounts if user is there
+      const approvedAccounts = JSON.parse(localStorage.getItem("approvedAccounts") || "[]");
+      const updatedApprovedAccounts = approvedAccounts.map((acc: any) =>
+        acc.id === currentUser.id ? updatedUser : acc
+      );
+      if (updatedApprovedAccounts.length > 0) {
+        localStorage.setItem("approvedAccounts", JSON.stringify(updatedApprovedAccounts));
+      }
 
       // Dispatch event to update all components
       window.dispatchEvent(new Event("auth-change"));

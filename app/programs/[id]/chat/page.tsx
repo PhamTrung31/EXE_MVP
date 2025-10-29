@@ -22,23 +22,38 @@ export default function ProgramChatPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const program = mockPrograms.find((p) => p.id === id);
-  const mockMessages = mockChatMessages.filter((m) => m.programId === id);
-  const [newMessage, setNewMessage] = useState("");
-  const [allMessages, setAllMessages] = useState(mockMessages);
   const { user, isLoading } = useAuth();
-
-  // Load custom messages from localStorage
+  
+  const [customPrograms, setCustomPrograms] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [allMessages, setAllMessages] = useState<any[]>([]);
+  
+  // Load custom programs
   useEffect(() => {
+    const stored = localStorage.getItem("customPrograms");
+    if (stored) {
+      setCustomPrograms(JSON.parse(stored));
+    }
+  }, []);
+  
+  const allPrograms = [...mockPrograms, ...customPrograms];
+  const program = allPrograms.find((p) => p.id === id);
+
+  // Load all messages (mock + custom) from localStorage
+  useEffect(() => {
+    const mockMessages = mockChatMessages.filter((m) => m.programId === id);
     const storedMessages = localStorage.getItem("customChatMessages");
+    
     if (storedMessages) {
       const parsed = JSON.parse(storedMessages);
       const programCustomMessages = parsed.filter(
         (m: any) => m.programId === id,
       );
       setAllMessages([...mockMessages, ...programCustomMessages]);
+    } else {
+      setAllMessages(mockMessages);
     }
-  }, [id, mockMessages]);
+  }, [id]);
 
   const userRegistration = user
     ? mockRegistrations.find(
@@ -132,8 +147,8 @@ export default function ProgramChatPage({
                     : "Bạn không có quyền truy cập chat này"}
               </p>
               {!user && (
-                <Button asChild className="bg-[#6085F0] hover:opacity-90">
-                  <Link href="/auth/volunteer">Đăng nhập</Link>
+                <Button asChild className="gradient-primary">
+                  <Link href="/auth/login">Đăng nhập</Link>
                 </Button>
               )}
               {user?.role === "volunteer" && !userRegistration && (

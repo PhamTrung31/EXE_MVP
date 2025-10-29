@@ -21,14 +21,32 @@ export default function CompleteProgramPage({
   const { id } = use(params);
   const router = useRouter();
   const { user } = useAuth();
-  const program = mockPrograms.find((p) => p.id === id);
+  const [customPrograms, setCustomPrograms] = useState<any[]>([]);
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
   const [volunteerHours, setVolunteerHours] = useState<{
     [key: string]: number;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Load custom programs and registrations
+  useEffect(() => {
+    const storedPrograms = localStorage.getItem("customPrograms");
+    if (storedPrograms) {
+      setCustomPrograms(JSON.parse(storedPrograms));
+    }
+    
+    const storedRegs = localStorage.getItem("programRegistrations");
+    if (storedRegs) {
+      setCustomRegistrations(JSON.parse(storedRegs));
+    }
+  }, []);
+
+  const allPrograms = [...mockPrograms, ...customPrograms];
+  const program = allPrograms.find((p) => p.id === id);
+  
+  const allRegistrations = [...mockRegistrations, ...customRegistrations];
   // Get approved volunteers for this program
-  const approvedVolunteers = mockRegistrations.filter(
+  const approvedVolunteers = allRegistrations.filter(
     (r) => r.programId === id && r.status === "approved",
   );
 
@@ -92,8 +110,15 @@ export default function CompleteProgramPage({
       const existingCertificates = JSON.parse(
         localStorage.getItem("customCertificates") || "[]",
       );
+      
+      // Get all accounts (mock + approved)
+      const approvedAccounts = JSON.parse(
+        localStorage.getItem("approvedAccounts") || "[]",
+      );
+      const allAccounts = [...mockAccounts, ...approvedAccounts];
+      
       const newCertificates = approvedVolunteers.map((reg) => {
-        const volunteer = mockAccounts.find((a) => a.id === reg.volunteerId);
+        const volunteer = allAccounts.find((a) => a.id === reg.volunteerId);
         return {
           id: `cert-${Date.now()}-${reg.volunteerId}`,
           volunteerId: reg.volunteerId,
@@ -111,10 +136,7 @@ export default function CompleteProgramPage({
         JSON.stringify([...existingCertificates, ...newCertificates]),
       );
 
-      // Mark program as completed
-      const customPrograms = JSON.parse(
-        localStorage.getItem("customPrograms") || "[]",
-      );
+      // Mark program as completed (update customPrograms only)
       const updatedPrograms = customPrograms.map((p: any) =>
         p.id === id ? { ...p, status: "completed" } : p,
       );

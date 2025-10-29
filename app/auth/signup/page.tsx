@@ -23,6 +23,7 @@ function SignupForm() {
     bio: "",
     address: "",
     website: "",
+    dateOfBirth: "",
   });
 
   // Check if coming from "Dành cho tổ chức" - set role to organization
@@ -36,23 +37,49 @@ function SignupForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Create account registration object
-    const accountRegistration = {
-      id: `acc-${Date.now()}`,
-      ...formData,
-      role: role,
-      status: "pending", // Wait for admin approval
-      registeredDate: new Date().toISOString().split("T")[0],
-    };
+    if (role === "volunteer") {
+      // Volunteers are auto-approved - create account directly
+      const newAccount = {
+        id: `vol-${Date.now()}`,
+        ...formData,
+        role: "volunteer",
+      };
 
-    // Save to localStorage for admin approval
-    const stored = localStorage.getItem("accountRegistrations");
-    const registrations = stored ? JSON.parse(stored) : [];
-    registrations.push(accountRegistration);
-    localStorage.setItem("accountRegistrations", JSON.stringify(registrations));
+      // Save to approvedAccounts directly
+      const approvedAccounts = JSON.parse(
+        localStorage.getItem("approvedAccounts") || "[]"
+      );
+      approvedAccounts.push(newAccount);
+      localStorage.setItem("approvedAccounts", JSON.stringify(approvedAccounts));
 
-    alert(`Đăng ký thành công! Tài khoản của bạn đang chờ Admin phê duyệt.`);
-    router.push("/auth/login");
+      // Save password
+      const userPasswords = JSON.parse(
+        localStorage.getItem("userPasswords") || "{}"
+      );
+      userPasswords[formData.email] = formData.password;
+      localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+
+      alert("Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.");
+      router.push("/auth/login");
+    } else {
+      // Organizations need admin approval
+      const orgRegistration = {
+        id: `org-reg-${Date.now()}`,
+        ...formData,
+        role: "organization",
+        status: "pending",
+        registeredDate: new Date().toISOString().split("T")[0],
+      };
+
+      // Save to orgRegistrations (for admin to approve)
+      const stored = localStorage.getItem("orgRegistrations");
+      const registrations = stored ? JSON.parse(stored) : [];
+      registrations.push(orgRegistration);
+      localStorage.setItem("orgRegistrations", JSON.stringify(registrations));
+
+      alert("Đăng ký thành công! Tài khoản tổ chức của bạn đang chờ Admin phê duyệt.");
+      router.push("/auth/login");
+    }
   };
 
   const handleChange = (
@@ -116,6 +143,7 @@ function SignupForm() {
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     {role === "volunteer" ? "Họ và tên" : "Tên tổ chức"}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="text"
@@ -136,6 +164,7 @@ function SignupForm() {
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Email
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="email"
@@ -152,6 +181,7 @@ function SignupForm() {
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Số điện thoại
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="tel"
@@ -168,6 +198,7 @@ function SignupForm() {
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Mật khẩu
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="password"
@@ -183,7 +214,7 @@ function SignupForm() {
                 {/* Conditional fields based on role */}
                 {role === "organization" ? (
                   <>
-                    {/* Address */}
+                    {/* Address (optional) */}
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Địa chỉ văn phòng
@@ -195,14 +226,14 @@ function SignupForm() {
                         onChange={handleChange}
                         placeholder="123 Đường ABC, Quận XYZ"
                         className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6085F0] bg-background text-foreground"
-                        required
                       />
                     </div>
 
-                    {/* Website */}
+                    {/* Website - REQUIRED */}
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
                         Website
+                        <span className="text-red-500 ml-1">*</span>
                       </label>
                       <input
                         type="url"
@@ -211,15 +242,32 @@ function SignupForm() {
                         onChange={handleChange}
                         placeholder="https://example.com"
                         className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6085F0] bg-background text-foreground"
+                        required
                       />
                     </div>
                   </>
                 ) : (
                   <>
-                    {/* Volunteer: Address (optional) */}
+                    {/* Volunteer: Date of Birth - REQUIRED */}
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
-                        Địa chỉ (không bắt buộc)
+                        Ngày sinh
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="dateOfBirth"
+                        value={formData.dateOfBirth}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6085F0] bg-background text-foreground"
+                        required
+                      />
+                    </div>
+
+                    {/* Volunteer: Address (optional) - fill space */}
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Địa chỉ
                       </label>
                       <input
                         type="text"
@@ -227,20 +275,6 @@ function SignupForm() {
                         value={formData.address}
                         onChange={handleChange}
                         placeholder="123 Đường ABC, Quận XYZ"
-                        className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6085F0] bg-background text-foreground"
-                      />
-                    </div>
-
-                    {/* Volunteer: Date of Birth */}
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        Ngày sinh (không bắt buộc)
-                      </label>
-                      <input
-                        type="date"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleChange}
                         className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6085F0] bg-background text-foreground"
                       />
                     </div>

@@ -36,9 +36,9 @@ export default function AdminDashboardPage() {
   const [orgRegistrations, setOrgRegistrations] = useState(
     mockOrganizationRegistrations,
   );
-  const [accountRegistrations, setAccountRegistrations] = useState<any[]>([]);
   const [customPrograms, setCustomPrograms] = useState<any[]>([]);
   const [customCertificates, setCustomCertificates] = useState<any[]>([]);
+  const [approvedAccounts, setApprovedAccounts] = useState<any[]>([]);
 
   // Tags management state
   const defaultTags = [
@@ -64,14 +64,6 @@ export default function AdminDashboardPage() {
       ]);
     }
 
-    // Load account registrations (new signups)
-    const accountStored = localStorage.getItem("accountRegistrations");
-    if (accountStored) {
-      const parsed = JSON.parse(accountStored);
-      setAccountRegistrations(
-        parsed.filter((r: any) => r.status === "pending"),
-      );
-    }
 
     // Load custom data for statistics
     const programs = JSON.parse(localStorage.getItem("customPrograms") || "[]");
@@ -80,6 +72,12 @@ export default function AdminDashboardPage() {
     );
     setCustomPrograms(programs);
     setCustomCertificates(certificates);
+
+    // Load approved accounts (volunteers + organizations approved by admin or auto)
+    const approved = JSON.parse(
+      localStorage.getItem("approvedAccounts") || "[]",
+    );
+    setApprovedAccounts(Array.isArray(approved) ? approved : []);
 
     // Load tags - if not exists, initialize with default
     const tagsStored = localStorage.getItem("adminTags");
@@ -113,46 +111,6 @@ export default function AdminDashboardPage() {
     (r) => r.status === "pending",
   );
 
-  const handleApproveAccount = (id: string) => {
-    const account = accountRegistrations.find((r) => r.id === id);
-    if (account) {
-      // Create approved account
-      const newAccount = {
-        id: `${account.role === "volunteer" ? "vol" : "org"}-${Date.now()}`,
-        name: account.name,
-        email: account.email,
-        phone: account.phone,
-        role: account.role,
-        bio: account.bio,
-        address: account.address,
-        website: account.website,
-      };
-
-      // Save to approved accounts (in real app, would save to database)
-      const approvedAccounts = JSON.parse(
-        localStorage.getItem("approvedAccounts") || "[]",
-      );
-      approvedAccounts.push(newAccount);
-      localStorage.setItem(
-        "approvedAccounts",
-        JSON.stringify(approvedAccounts),
-      );
-
-      // Remove from pending
-      const updated = accountRegistrations.filter((r) => r.id !== id);
-      setAccountRegistrations(updated);
-      localStorage.setItem("accountRegistrations", JSON.stringify(updated));
-
-      alert(`Đã duyệt tài khoản ${account.name}!`);
-    }
-  };
-
-  const handleRejectAccount = (id: string) => {
-    const updated = accountRegistrations.filter((r) => r.id !== id);
-    setAccountRegistrations(updated);
-    localStorage.setItem("accountRegistrations", JSON.stringify(updated));
-    alert("Đã từ chối đăng ký tài khoản!");
-  };
 
   const handleApproveOrgRegistration = (id: string) => {
     const updated = orgRegistrations.map((r) =>
@@ -270,8 +228,8 @@ export default function AdminDashboardPage() {
             <h1 className="text-4xl font-bold text-foreground mb-2">
               Bảng điều khiển Admin
             </h1>
-            <p className="text-muted-foreground">Quản lý nền tảng Together</p>
-          </div>
+              <p className="text-muted-foreground">Quản lý nền tảng Together</p>
+            </div>
 
           {/* Tabs */}
           <div className="flex gap-2 mb-8 border-b border-border">
@@ -313,164 +271,103 @@ export default function AdminDashboardPage() {
           {/* Overview Tab */}
           {activeTab === "overview" && (
             <>
-              {/* Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                 <Card className="p-6 border-[#77E5C8] bg-[#77E5C8]/10">
-                  <div className="flex items-center justify-between">
-                    <div>
+              <div className="flex items-center justify-between">
+                <div>
                       <p className="text-muted-foreground text-sm mb-1">
                         Tình nguyện viên
                       </p>
                       <p className="text-3xl font-bold text-foreground">
                         {volunteers.length}
                       </p>
-                    </div>
+                </div>
                     <Users className="w-12 h-12 text-[#6085F0]" />
-                  </div>
-                </Card>
+              </div>
+            </Card>
                 <Card className="p-6 border-[#77E5C8] bg-[#77E5C8]/10">
-                  <div className="flex items-center justify-between">
-                    <div>
+              <div className="flex items-center justify-between">
+                <div>
                       <p className="text-muted-foreground text-sm mb-1">
                         Tổ chức
                       </p>
                       <p className="text-3xl font-bold text-foreground">
                         {organizations.length}
                       </p>
-                    </div>
+                </div>
                     <Briefcase className="w-12 h-12 text-[#6085F0]" />
-                  </div>
-                </Card>
+              </div>
+            </Card>
                 <Card className="p-6 border-[#77E5C8] bg-[#77E5C8]/10">
-                  <div className="flex items-center justify-between">
-                    <div>
+              <div className="flex items-center justify-between">
+                <div>
                       <p className="text-muted-foreground text-sm mb-1">
                         Chương trình
                       </p>
                       <p className="text-3xl font-bold text-foreground">
                         {mockPrograms.length}
                       </p>
-                    </div>
+                </div>
                     <FileText className="w-12 h-12 text-[#6085F0]" />
-                  </div>
-                </Card>
+              </div>
+            </Card>
                 <Card className="p-6 border-[#77E5C8] bg-[#77E5C8]/10">
-                  <div className="flex items-center justify-between">
-                    <div>
+              <div className="flex items-center justify-between">
+                <div>
                       <p className="text-muted-foreground text-sm mb-1">
                         Chứng chỉ
                       </p>
                       <p className="text-3xl font-bold text-foreground">
-                        {mockCertificates.length}
+                        {([...mockCertificates, ...customCertificates]).length}
                       </p>
-                    </div>
+                </div>
                     <Award className="w-12 h-12 text-[#6085F0]" />
-                  </div>
-                </Card>
               </div>
+            </Card>
+          </div>
 
-              {/* Account Registrations Section */}
-              {accountRegistrations.length > 0 && (
-                <Card className="p-8 border-[#77E5C8] mb-8">
-                  <h2 className="text-2xl font-bold text-foreground mb-6">
-                    Tài khoản mới chờ duyệt
-                  </h2>
-                  <div className="space-y-4">
-                    {accountRegistrations.map((acc) => (
-                      <div
-                        key={acc.id}
-                        className="p-4 border border-border rounded-lg bg-blue-50"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-foreground">
-                              {acc.name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {acc.email}
-                            </p>
-                          </div>
-                          <span
-                            className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                              acc.role === "volunteer"
-                                ? "text-green-600 bg-green-100"
-                                : "text-purple-600 bg-purple-100"
-                            }`}
-                          >
-                            {acc.role === "volunteer"
-                              ? "Tình nguyện viên"
-                              : "Tổ chức"}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Điện thoại: {acc.phone}
-                        </p>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          Đăng ký: {acc.registeredDate}
-                        </p>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="gradient-primary hover:opacity-90"
-                            onClick={() => handleApproveAccount(acc.id)}
-                          >
-                            Duyệt
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleRejectAccount(acc.id)}
-                          >
-                            Từ chối
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className="p-8 border-[#77E5C8]">
                   <h2 className="text-2xl font-bold text-foreground mb-6">
                     Đơn đăng ký tổ chức chờ duyệt
                   </h2>
-                  <div className="space-y-4">
-                    {pendingOrgRegistrations.length > 0 ? (
-                      pendingOrgRegistrations.map((reg) => (
+              <div className="space-y-4">
+                {pendingOrgRegistrations.length > 0 ? (
+                  pendingOrgRegistrations.map((reg) => (
                         <div
                           key={reg.id}
                           className="p-4 border border-border rounded-lg bg-yellow-50"
                         >
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
                               <h3 className="font-semibold text-foreground">
                                 {reg.organizationName}
                               </h3>
                               <p className="text-sm text-muted-foreground">
                                 {reg.email}
                               </p>
-                            </div>
-                            <span className="text-xs font-semibold text-yellow-600 bg-white px-3 py-1 rounded-full">
-                              Chờ duyệt
-                            </span>
-                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-yellow-600 bg-white px-3 py-1 rounded-full">
+                          Chờ duyệt
+                        </span>
+                      </div>
                           <p className="text-sm text-muted-foreground mb-2">
                             Điện thoại: {reg.phone}
                           </p>
                           <p className="text-sm text-muted-foreground mb-3">
                             Đăng ký: {reg.appliedDate}
                           </p>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
                               className="bg-[#6085F0] hover:opacity-90"
                               onClick={() =>
                                 handleApproveOrgRegistration(reg.id)
                               }
-                            >
-                              Duyệt
-                            </Button>
+                        >
+                          Duyệt
+                        </Button>
                             <Button
                               size="sm"
                               variant="outline"
@@ -478,109 +375,111 @@ export default function AdminDashboardPage() {
                                 handleRejectOrgRegistration(reg.id)
                               }
                             >
-                              Từ chối
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
+                          Từ chối
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
                       <p className="text-muted-foreground">
                         Không có đơn đăng ký tổ chức chờ duyệt
                       </p>
-                    )}
-                  </div>
-                </Card>
+                )}
+              </div>
+            </Card>
 
-                {/* Recent Certificates */}
+            {/* Recent Certificates */}
                 <Card className="p-8 border-[#77E5C8]">
                   <h2 className="text-2xl font-bold text-foreground mb-6">
                     Chứng chỉ gần đây
                   </h2>
-                  <div className="space-y-4">
-                    {mockCertificates.slice(0, 5).map((cert) => (
+              <div className="space-y-4">
+                {([...mockCertificates, ...customCertificates]
+                  .slice(-5)
+                  ).map((cert) => (
                       <div
                         key={cert.id}
                         className="p-4 border border-border rounded-lg"
                       >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
                             <h3 className="font-semibold text-foreground">
                               {cert.volunteerName}
                             </h3>
                             <p className="text-sm text-muted-foreground">
                               {cert.programName}
                             </p>
-                          </div>
-                          <span className="text-xs font-semibold text-[#6085F0] bg-[#77E5C8]/10 px-3 py-1 rounded-full">
-                            {cert.hoursContributed}h
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Số: {cert.certificateNumber} - Cấp: {cert.issuedDate}
-                        </p>
                       </div>
-                    ))}
+                          <span className="text-xs font-semibold text-[#6085F0] bg-[#77E5C8]/10 px-3 py-1 rounded-full">
+                        {cert.hoursContributed}h
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Số: {cert.certificateNumber} - Cấp: {cert.issuedDate}
+                    </p>
                   </div>
-                </Card>
+                ))}
+              </div>
+            </Card>
 
-                {/* Volunteers List */}
+            {/* Volunteers List */}
                 <Card className="p-8 border-[#77E5C8]">
                   <h2 className="text-2xl font-bold text-foreground mb-6">
                     Tình nguyện viên
                   </h2>
-                  <div className="space-y-3">
-                    {volunteers.map((vol) => (
+              <div className="space-y-3">
+                {volunteers.map((vol) => (
                       <div
                         key={vol.id}
                         className="p-3 border border-border rounded-lg flex items-center justify-between hover:bg-[#77E5C8]/10 transition"
                       >
-                        <div>
+                    <div>
                           <p className="font-semibold text-foreground">
                             {vol.name}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {vol.email}
                           </p>
-                        </div>
+                    </div>
                         <Button size="sm" variant="outline" asChild>
                           <Link href={`/admin/volunteers/${vol.id}`}>
-                            Chi tiết
+                      Chi tiết
                           </Link>
-                        </Button>
-                      </div>
-                    ))}
+                    </Button>
                   </div>
-                </Card>
+                ))}
+              </div>
+            </Card>
 
-                {/* Organizations List */}
+            {/* Organizations List */}
                 <Card className="p-8 border-[#77E5C8]">
                   <h2 className="text-2xl font-bold text-foreground mb-6">
                     Tổ chức
                   </h2>
-                  <div className="space-y-3">
-                    {organizations.map((org) => (
+              <div className="space-y-3">
+                {organizations.map((org) => (
                       <div
                         key={org.id}
                         className="p-3 border border-border rounded-lg flex items-center justify-between hover:bg-blue-50 transition"
                       >
-                        <div>
+                    <div>
                           <p className="font-semibold text-foreground">
                             {org.name}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {org.email}
                           </p>
-                        </div>
+                    </div>
                         <Button size="sm" variant="outline" asChild>
                           <Link href={`/admin/organizations/${org.id}`}>
-                            Chi tiết
+                      Chi tiết
                           </Link>
-                        </Button>
-                      </div>
-                    ))}
+                    </Button>
                   </div>
-                </Card>
+                ))}
               </div>
+            </Card>
+          </div>
             </>
           )}
 
@@ -589,7 +488,7 @@ export default function AdminDashboardPage() {
             <StatisticsContent
               customPrograms={customPrograms}
               customCertificates={customCertificates}
-              accountRegistrations={accountRegistrations}
+              approvedAccounts={approvedAccounts}
             />
           )}
 
@@ -707,18 +606,15 @@ export default function AdminDashboardPage() {
 function StatisticsContent({
   customPrograms,
   customCertificates,
-  accountRegistrations,
+  approvedAccounts,
 }: {
   customPrograms: any[];
   customCertificates: any[];
-  accountRegistrations: any[];
+  approvedAccounts: any[];
 }) {
-  const totalVolunteers = mockAccounts.filter(
-    (a) => a.role === "volunteer",
-  ).length;
-  const totalOrganizations = mockAccounts.filter(
-    (a) => a.role === "organization",
-  ).length;
+  const allAccounts = [...mockAccounts, ...approvedAccounts];
+  const totalVolunteers = allAccounts.filter((a) => a.role === "volunteer").length;
+  const totalOrganizations = allAccounts.filter((a) => a.role === "organization").length;
   const allPrograms = [...mockPrograms, ...customPrograms];
   const totalPrograms = allPrograms.length;
   const activePrograms = allPrograms.filter(
@@ -741,10 +637,6 @@ function StatisticsContent({
   ).length;
   const pendingRegistrations = mockRegistrations.filter(
     (r) => r.status === "pending",
-  ).length;
-
-  const pendingAccounts = accountRegistrations.filter(
-    (a) => a.status === "pending",
   ).length;
 
   // Programs by category
@@ -911,18 +803,6 @@ function StatisticsContent({
                 %
               </div>
             </div>
-            {pendingAccounts > 0 && (
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Tài khoản chờ duyệt
-                  </p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {pendingAccounts}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </Card>
       </div>

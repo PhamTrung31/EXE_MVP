@@ -62,10 +62,20 @@ export function useAuth() {
     email: string,
     role: "volunteer" | "organization" | "admin",
   ) => {
-    // Find user from mock data
-    const account = mockAccounts.find(
+    // Find user from mock data first
+    let account = mockAccounts.find(
       (acc) => acc.email === email && acc.role === role,
     );
+
+    // If not found in mock, check approved accounts (admin-approved)
+    if (!account) {
+      const approvedAccounts = JSON.parse(
+        localStorage.getItem("approvedAccounts") || "[]",
+      );
+      account = approvedAccounts.find(
+        (acc: any) => acc.email === email && acc.role === role,
+      );
+    }
 
     if (account) {
       const authUser: AuthUser = {
@@ -76,10 +86,10 @@ export function useAuth() {
         avatar: account.avatar,
       };
 
-      // Update localStorage first
-      localStorage.setItem("currentUser", JSON.stringify(authUser));
+      // Save full account object to localStorage (including phone, bio, address, website)
+      localStorage.setItem("currentUser", JSON.stringify(account));
 
-      // Then update state immediately - this will trigger re-renders
+      // Then update state with AuthUser type (for component usage)
       setUser(authUser);
 
       // Force immediate re-render by dispatching event synchronously

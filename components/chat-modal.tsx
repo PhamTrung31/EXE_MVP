@@ -20,13 +20,25 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
     null,
   );
   const [customMessages, setCustomMessages] = useState<any[]>([]);
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
+  const [customPrograms, setCustomPrograms] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load custom messages from localStorage
+  // Load custom data from localStorage
   useEffect(() => {
     const storedMessages = localStorage.getItem("customChatMessages");
     if (storedMessages) {
       setCustomMessages(JSON.parse(storedMessages));
+    }
+    
+    const storedRegistrations = localStorage.getItem("programRegistrations");
+    if (storedRegistrations) {
+      setCustomRegistrations(JSON.parse(storedRegistrations));
+    }
+    
+    const storedPrograms = localStorage.getItem("customPrograms");
+    if (storedPrograms) {
+      setCustomPrograms(JSON.parse(storedPrograms));
     }
   }, [isOpen]);
 
@@ -38,13 +50,17 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
   }, [user, isOpen, onClose]);
 
   // Get ALL registrations (both approved and completed) for this volunteer
-  const allRegistrations = mockRegistrations.filter(
+  const combinedRegistrations = [...mockRegistrations, ...customRegistrations];
+  const allRegistrations = combinedRegistrations.filter(
     (r) => r.volunteerId === user?.id,
   );
 
+  // Get all programs
+  const allPrograms = [...mockPrograms, ...customPrograms];
+
   const programsWithChat = allRegistrations
     .map((reg) => {
-      const program = mockPrograms.find((p) => p.id === reg.programId);
+      const program = allPrograms.find((p) => p.id === reg.programId);
       return { program, registration: reg };
     })
     .filter((item) => item.program);

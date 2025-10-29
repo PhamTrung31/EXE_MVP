@@ -21,7 +21,18 @@ export default function ProgramRegisterPage({
   const { id } = use(params);
   const router = useRouter();
   const { user } = useAuth();
-  const program = mockPrograms.find((p) => p.id === id);
+  const [customPrograms, setCustomPrograms] = useState<any[]>([]);
+  
+  // Load custom programs
+  useEffect(() => {
+    const stored = localStorage.getItem("customPrograms");
+    if (stored) {
+      setCustomPrograms(JSON.parse(stored));
+    }
+  }, []);
+  
+  const allPrograms = [...mockPrograms, ...customPrograms];
+  const program = allPrograms.find((p) => p.id === id);
 
   const [formData, setFormData] = useState({
     fullName: "",

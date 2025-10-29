@@ -5,19 +5,35 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { mockPrograms } from "@/lib/mock-data";
+import { mockPrograms, mockRegistrations } from "@/lib/mock-data";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function ProgramsPage() {
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [allPrograms, setAllPrograms] = useState(mockPrograms);
+  const [customRegistrations, setCustomRegistrations] = useState<any[]>([]);
 
   useEffect(() => {
     const customPrograms = JSON.parse(
       localStorage.getItem("customPrograms") || "[]",
     );
     setAllPrograms([...mockPrograms, ...customPrograms]);
+    
+    const storedRegs = localStorage.getItem("programRegistrations");
+    if (storedRegs) {
+      setCustomRegistrations(JSON.parse(storedRegs));
+    }
   }, []);
+
+  const allRegistrations = [...mockRegistrations, ...customRegistrations];
+  
+  // Helper to check if user registered for a program
+  const getUserRegistration = (programId: string) => {
+    if (!user) return null;
+    return allRegistrations.find((r) => r.programId === programId && r.volunteerId === user.id);
+  };
 
   const categories = Array.from(new Set(allPrograms.map((p) => p.category)));
   const filteredPrograms = selectedCategory
@@ -127,8 +143,25 @@ export default function ProgramsPage() {
                       </div>
                     </div>
                   </div>
+                  {user?.role === "volunteer" && getUserRegistration(program.id) && (
+                    <div className="mb-2 px-3 py-2 rounded-lg text-sm font-medium text-center"
+                      style={{
+                        backgroundColor: getUserRegistration(program.id)?.status === "approved" 
+                          ? "#d1fae5" 
+                          : "#fef3c7",
+                        color: getUserRegistration(program.id)?.status === "approved"
+                          ? "#065f46"
+                          : "#92400e"
+                      }}
+                    >
+                      {getUserRegistration(program.id)?.status === "approved" 
+                        ? "✓ Đang tham gia" 
+                        : "⏳ Chờ duyệt"
+                      }
+                    </div>
+                  )}
                   <Button
-                    className="w-full bg-gradient-to-r from-[#77E5C8] to-[#6085F0] hover:opacity-90 shadow-lg hover:shadow-lg transition-all duration-300"
+                    className="w-full gradient-primary hover:opacity-90 shadow-lg hover:shadow-lg transition-all duration-300"
                     asChild
                   >
                     <Link href={`/programs/${program.id}`}>Xem chi tiết</Link>

@@ -130,7 +130,7 @@ export function Header() {
                   );
                 }}
               >
-                <button
+              <button
                   onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                   className="relative p-2 rounded-xl hover:bg-[#77E5C8]/10 transition-all duration-200 border border-transparent hover:border-[#77E5C8]"
                 >
@@ -284,30 +284,30 @@ export function Header() {
                   className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-[#77E5C8]/10 transition-all duration-200 border border-transparent hover:border-[#77E5C8] hover:shadow-sm"
                 >
                   <div className="w-9 h-9 bg-gradient-to-br from-[#77E5C8] to-[#6085F0] rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-md">
-                    {user.name.charAt(0).toUpperCase()}
-                  </div>
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
                   <span className="text-foreground font-medium">
                     {user.name}
                   </span>
-                  <svg
+                <svg
                     className={`w-4 h-4 text-foreground transition-transform duration-200 ${
                       isDropdownOpen ? "rotate-180" : ""
                     }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
                       d="M19 14l-7 7m0 0l-7-7m7 7V3"
                     />
-                  </svg>
-                </button>
+                </svg>
+              </button>
 
                 {/* Dropdown menu */}
-                {isDropdownOpen && (
+              {isDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-sm border border-border/50 rounded-xl shadow-xl z-50 pointer-events-auto animate-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-4 border-b border-border/50">
                       <p className="text-sm font-semibold text-foreground">
@@ -319,17 +319,17 @@ export function Header() {
                       <span className="inline-block mt-2 px-2 py-1 text-xs text-[#6085F0] bg-[#77E5C8]/10 rounded-full font-medium capitalize">
                         {user.role}
                       </span>
-                    </div>
+                  </div>
 
-                    <div className="py-2">
-                      <Link
-                        href={
-                          user.role === "volunteer"
-                            ? "/volunteer/dashboard"
-                            : user.role === "organization"
-                              ? "/organization/dashboard"
-                              : "/admin/dashboard"
-                        }
+                  <div className="py-2">
+                    <Link
+                      href={
+                        user.role === "volunteer"
+                          ? "/volunteer/dashboard"
+                          : user.role === "organization"
+                            ? "/organization/dashboard"
+                            : "/admin/dashboard"
+                      }
                         className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-[#77E5C8]/10 transition-colors duration-150"
                         onClick={() => setIsDropdownOpen(false)}
                       >
@@ -357,8 +357,8 @@ export function Header() {
                       <Link
                         href="/profile/settings"
                         className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-[#77E5C8]/10 transition-colors duration-150"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
                         <svg
                           className="w-4 h-4"
                           fill="none"
@@ -379,9 +379,9 @@ export function Header() {
                           />
                         </svg>
                         Cài đặt hồ sơ
-                      </Link>
-                      <button
-                        onClick={() => {
+                    </Link>
+                    <button
+                      onClick={() => {
                           logout();
                           setIsDropdownOpen(false);
                           router.push("/");
@@ -401,12 +401,12 @@ export function Header() {
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                           />
                         </svg>
-                        Đăng xuất
-                      </button>
-                    </div>
+                      Đăng xuất
+                    </button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+            </div>
             </>
           ) : (
             <div className="flex items-center gap-3">
